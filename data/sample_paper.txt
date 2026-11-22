@@ -1,0 +1,3 @@
+P001|Introduction to Machine Learning|Machine learning helps build recommendation systems|Computer Science
+P002|Information Retrieval|Search engines retrieve relevant documents using ranking algorithms|Computer Science
+P003|Machine Learning Applications|Machine learning models can rank documents and improve search results|Computer Science

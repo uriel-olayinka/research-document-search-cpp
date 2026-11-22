@@ -1,0 +1,113 @@
+#include <algorithm>
+#include <cctype>
+#include <iostream>
+#include <string>
+#include <utility>
+#include <vector>
+
+
+std::vector<std::string> getWords(const std::string& text) {
+    std::vector<std::string> words;
+    std::string word;
+
+    for (unsigned char ch : text) {
+        if (std::isalnum(ch)) {
+            word += static_cast<char>(std::tolower(ch));
+        } else if (!word.empty()) {
+            words.push_back(word);
+            word.clear();
+        }
+    }
+
+    if (!word.empty()) {
+        words.push_back(word);
+    }
+
+    return words;
+}
+
+
+struct Paper {
+    std::string id;
+    std::string title;
+    std::string abstractText;
+    std::string category;
+};
+
+class SearchEngine {
+public:
+    void addPaper(const Paper& paper) {
+        papers.push_back(paper);
+    }
+
+    std::vector<std::pair<int, Paper>> search(
+        const std::string& query) const {
+        const auto queryWords = getWords(query);
+        std::vector<std::pair<int, Paper>> results;
+
+        for (const Paper& paper : papers) {
+            const auto titleWords = getWords(paper.title);
+            const auto abstractWords = getWords(paper.abstractText);
+            int score = 0;
+
+            for (const std::string& queryWord : queryWords) {
+                score += static_cast<int>(
+                    std::count(titleWords.begin(), titleWords.end(), queryWord));
+                score += static_cast<int>(
+                    std::count(abstractWords.begin(), abstractWords.end(), queryWord));
+            }
+
+            if (score > 0) {
+                results.push_back({score, paper});
+            }
+        }
+
+        std::sort(results.begin(), results.end(),
+                  [](const auto& a, const auto& b) {
+                      return a.first > b.first;
+                  });
+
+        return results;
+    }
+
+private:
+    std::vector<Paper> papers;
+};
+
+int main() {
+    SearchEngine engine;
+
+    engine.addPaper({
+        "P001",
+        "Introduction to Machine Learning",
+        "Machine learning helps build recommendation systems",
+        "Computer Science"
+    });
+
+    engine.addPaper({
+        "P002",
+        "Information Retrieval",
+        "Search engines retrieve relevant documents using ranking algorithms",
+        "Computer Science"
+    });
+
+    engine.addPaper({
+        "P003",
+        "Machine Learning Applications",
+        "Machine learning models can rank documents and improve search results",
+        "Computer Science"
+    });
+
+    const auto results = engine.search("machine learning");
+
+    std::cout << "Search Results:\n";
+    for (const auto& result : results) {
+        const Paper& paper = result.second;
+        std::cout << "Score: " << result.first
+                  << " | ID: " << paper.id
+                  << " | Title: " << paper.title
+                  << " | Category: " << paper.category << '\n';
+    }
+
+    return 0;
+}
