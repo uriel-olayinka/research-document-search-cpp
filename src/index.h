@@ -46,4 +46,18 @@ void buildIndex(const std::vector<Paper>& papers, HashTable& table);
 // Returns log(N / number of papers containing the word), or 0 if the word is not in the table
 double computeIDF(const HashTable& table, const std::string& word, int totalPapers);
 
+struct Result {
+    int paper;
+    double score;
+};
+
+// Adds up the TF-IDF score of every paper that contains at least one query word
+std::vector<Result> scorePapers(const HashTable& table, const std::vector<std::string>& words, int totalPapers);
+
+// Sorts results by score, highest first; equal scores keep their original order
+void mergeSortResults(std::vector<Result>& results);
+
+// Tokenizes the query, scores matching papers, and returns them ranked
+std::vector<Result> search(const std::string& query, const HashTable& table, int totalPapers);
+
 #endif
