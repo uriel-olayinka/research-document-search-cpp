@@ -1,4 +1,5 @@
 #include "index.h"
+#include <cmath>
 
 // Turns a word into large number used to pick its bucket
 unsigned long hashWord(const std::string& word) {
@@ -92,4 +93,23 @@ void freeTable(HashTable& table) {
     table.buckets = nullptr;
     table.bucketCount = 0;
     table.size = 0;
+}
+
+// Splits every paper's title and abstract into words and adds each word to the table
+void buildIndex(const std::vector<Paper>& papers, HashTable& table) {
+    for (int i = 0; i < (int)papers.size(); i++) {
+        std::vector<std::string> words = tokenize(papers[i].title + " " + papers[i].abstractText);
+        for (const std::string& w : words) {
+            insertTerm(table, w, i);
+        }
+    }
+}
+
+// Returns log(N / number of papers containing the word), or 0 if the word is not in the table
+double computeIDF(const HashTable& table, const std::string& word, int totalPapers) {
+    const std::vector<Posting>* postings = lookupTerm(table, word);
+    if (postings == nullptr || postings->empty()) {
+        return 0.0;
+    }
+    return std::log(static_cast<double>(totalPapers) / postings->size());
 }

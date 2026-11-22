@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include "common.h"
 
 struct Posting {
     int paper;
@@ -38,5 +39,11 @@ void resizeTable(HashTable& table);
 
 // Frees all memory used by the table
 void freeTable(HashTable& table);
+
+// Splits every paper's title and abstract into words and adds each word to the table
+void buildIndex(const std::vector<Paper>& papers, HashTable& table);
+
+// Returns log(N / number of papers containing the word), or 0 if the word is not in the table
+double computeIDF(const HashTable& table, const std::string& word, int totalPapers);
 
 #endif
