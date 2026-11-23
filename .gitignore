@@ -66,3 +66,9 @@ vcpkg_installed/
 # test output & cache
 Testing/
 .cache/
+
+test_hash
+searchengine
+test_index
+test_search
+generate_data
