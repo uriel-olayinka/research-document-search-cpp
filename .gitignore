@@ -69,3 +69,6 @@ Testing/
 
 test_hash
 searchengine
+test_index
+test_search
+generate_data

@@ -1,0 +1,9 @@
+P101|Valid Paper One|This abstract is fine.|algorithms
+P102|Missing category field|Only three fields here
+|No ID Here|Abstract text.|algorithms
+P104||Title is empty.|algorithms
+
+P106|Valid Paper Two||algorithms
+this line has no separators at all
+P108|Valid Paper Three|Another fine abstract.|data structures
+P109|Too|Many|Fields|here|algorithms
