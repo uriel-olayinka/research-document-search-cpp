@@ -1,46 +1,16 @@
 #include "common.h"
+#include "index.h"
 
 #include <algorithm>
 #include <iostream>
+#include <limits>
 #include <string>
-#include <utility>
 #include <vector>
 
 namespace {
 
-std::vector<std::pair<int, Paper>> searchPapers(
-    const std::vector<Paper>& papers,
-    const std::string& query) {
-    const auto queryTokens = tokenize(query);
-    std::vector<std::pair<int, Paper>> results;
-
-    for (const Paper& paper : papers) {
-        const auto titleTokens = tokenize(paper.title);
-        const auto abstractTokens = tokenize(paper.abstractText);
-        int score = 0;
-
-        for (const std::string& qToken : queryTokens) {
-            score += static_cast<int>(
-                std::count(titleTokens.begin(), titleTokens.end(), qToken));
-            score += static_cast<int>(
-                std::count(abstractTokens.begin(), abstractTokens.end(), qToken));
-        }
-
-        if (score > 0) {
-            results.push_back({score, paper});
-        }
-    }
-
-    std::sort(results.begin(), results.end(),
-              [](const auto& a, const auto& b) {
-                  if (a.first != b.first) {
-                      return a.first > b.first;
-                  }
-                  return a.second.id < b.second.id;
-              });
-
-    return results;
-}
+constexpr int kInitialBuckets = 1024;
+constexpr size_t kMaxResults = 10;
 
 void printMenu() {
     std::cout << "\n=== Research Document Search Engine ===\n"
@@ -51,40 +21,55 @@ void printMenu() {
               << "Select an option: ";
 }
 
+// Throws away the old index and builds a new one from the loaded papers
+void rebuildIndex(HashTable& table, const std::vector<Paper>& papers) {
+    freeTable(table);
+    initTable(table, kInitialBuckets);
+    buildIndex(papers, table);
+}
+
 }  // namespace
 
 int main() {
     std::vector<Paper> papers;
     int badLines = 0;
 
-    const std::string defaultFile = "data/sample_papers.txt";
+    HashTable table{};
+    initTable(table, kInitialBuckets);
+
+    const std::string defaultFile = "data/sample_5000.txt";
     if (loadPapers(defaultFile, papers, badLines)) {
+        rebuildIndex(table, papers);
         std::cout << "Loaded " << papers.size() << " papers from " << defaultFile
                   << " (skipped bad lines: " << badLines << ").\n";
+    } else {
+        std::cout << "Error: could not load default file '" << defaultFile << "'.\n";
     }
 
     while (true) {
         printMenu();
         int choice = -1;
         if (!(std::cin >> choice)) {
+            if (std::cin.eof()) break;
             std::cin.clear();
-            std::cin.ignore(10000, '\n');
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
             std::cout << "Invalid input. Please enter a number.\n";
             continue;
         }
-        std::cin.ignore(10000, '\n');  
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
         if (choice == 0) {
             std::cout << "Exiting...\n";
             break;
         } else if (choice == 1) {
             std::string path;
-            std::cout << "Enter file path (e.g., data/sample_paper.txt): ";
-            std::getline(std::cin, path);
+            std::cout << "Enter file path (e.g., data/sample_5000.txt): ";
+            if (!std::getline(std::cin, path)) break;
 
             int currentBad = 0;
             if (loadPapers(path, papers, currentBad)) {
                 badLines = currentBad;
+                rebuildIndex(table, papers);
                 std::cout << "Loaded " << papers.size() << " papers "
                           << "(skipped bad lines: " << badLines << ").\n";
             } else {
@@ -93,13 +78,17 @@ int main() {
         } else if (choice == 2) {
             std::string query;
             std::cout << "Enter search query: ";
-            std::getline(std::cin, query);
+            if (!std::getline(std::cin, query)) break;
 
-            const auto results = searchPapers(papers, query);
-            std::cout << "Found " << results.size() << " result(s):\n";
-            for (const auto& result : results) {
-                const Paper& paper = result.second;
-                std::cout << "Score: " << result.first
+            const auto results = search(query, table, static_cast<int>(papers.size()));
+            std::cout << "Found " << results.size() << " result(s)";
+            if (results.size() > kMaxResults) {
+                std::cout << " (showing top " << kMaxResults << ")";
+            }
+            std::cout << ":\n";
+            for (size_t i = 0; i < results.size() && i < kMaxResults; ++i) {
+                const Paper& paper = papers[results[i].paper];
+                std::cout << "Score: " << results[i].score
                           << " | ID: " << paper.id
                           << " | Title: " << paper.title
                           << " | Category: " << paper.category << '\n';
@@ -115,5 +104,6 @@ int main() {
         }
     }
 
+    freeTable(table);
     return 0;
 }
