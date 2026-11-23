@@ -1,0 +1,10 @@
+P001|Shortest Paths in Graphs|This method finds shortest paths in a weighted graph using a priority queue.|algorithms
+P002|Graph Coloring Heuristics|A greedy method colors each graph vertex so that neighbors differ. Graph coloring is NP-hard.|algorithms
+P003|Balanced Search Trees|This method keeps a binary search tree balanced with rotations after each insert.|data structures
+P004|Hash Table Design|We compare chaining and open addressing as a method for handling collisions in a hash table.|data structures
+P005|Sorting Large Arrays|Merge sort and quick sort are compared as a method for sorting large arrays.|algorithms
+P006|Tries for Autocomplete|A trie stores words by prefix; this method gives fast autocomplete suggestions.|data structures
+P007|Neural Networks for Text|A neural network method classifies text documents by topic.|machine learning
+P008|Ranking Search Results|This method ranks documents with TF-IDF so that rare words count more.|information retrieval
+P009|Minimum Spanning Trees|Kruskal's method builds a minimum spanning tree of a graph by adding the cheapest edges.|algorithms
+P010|Gradient Descent Basics|Gradient descent is an iterative method that minimizes a loss function.|machine learning
