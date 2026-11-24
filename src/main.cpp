@@ -2,6 +2,7 @@
 #include "index.h"
 
 #include <algorithm>
+#include <iomanip>
 #include <iostream>
 #include <limits>
 #include <string>
@@ -88,7 +89,7 @@ int main() {
             std::cout << ":\n";
             for (size_t i = 0; i < results.size() && i < kMaxResults; ++i) {
                 const Paper& paper = papers[results[i].paper];
-                std::cout << "Score: " << results[i].score
+                std::cout << "Score: " << std::fixed << std::setprecision(4) << results[i].score
                           << " | ID: " << paper.id
                           << " | Title: " << paper.title
                           << " | Category: " << paper.category << '\n';
