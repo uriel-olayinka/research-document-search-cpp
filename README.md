@@ -49,6 +49,27 @@ The program loads pipe-delimited paper records, builds an inverted index, and se
 
 ## Testing
 
+### Unit tests
+
+Three test programs in `tests/` check the core functions directly. Each prints `PASS` or `FAIL` for every check. Run from the project root.
+
+On macOS or Linux:
+
+```bash
+g++ -std=c++17 -Wall -Isrc src/index.cpp tests/test_hash.cpp -o test_hash
+./test_hash
+g++ -std=c++17 -Wall -Isrc src/index.cpp src/loader.cpp tests/test_index.cpp -o test_index
+./test_index
+g++ -std=c++17 -Wall -Isrc src/index.cpp src/loader.cpp tests/test_search.cpp -o test_search
+./test_search
+```
+
+On Windows PowerShell, use the same commands with `.exe` output names (for example `-o test_hash.exe`, then `.\test_hash.exe`).
+
+Expected: 7 checks pass in `test_hash`, 10 in `test_index`, and 9 in `test_search`.
+
+### Menu tests
+
 The following tests were run through the program's menu. Actual results matched the expected results in each case.
 
 | Test | Input or scenario | Expected result | Actual result | Pass/Fail |
